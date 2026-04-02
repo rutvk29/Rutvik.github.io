@@ -1,129 +1,159 @@
 // MENU SYSTEM
-const menuBtn=document.getElementById("menuBtn");
-const sidebar=document.getElementById("sidebar");
-const settingsBtn=document.getElementById("settingsBtn");
-const settings=document.getElementById("settings");
-const overlay=document.getElementById("overlay");
+const menuBtn = document.getElementById("menuBtn");
+const sidebar = document.getElementById("sidebar");
+const settingsBtn = document.getElementById("settingsBtn");
+const settings = document.getElementById("settings");
+const overlay = document.getElementById("overlay");
 
-menuBtn.onclick=()=>{
-sidebar.classList.add("active");
-settings.classList.remove("active");
-overlay.classList.add("active");
+const closeMenu = document.getElementById("closeMenu");
+const closeSettings = document.getElementById("closeSettings");
+
+// OPEN
+menuBtn.onclick = () => {
+  sidebar.classList.add("active");
+  settings.classList.remove("active");
+  overlay.classList.add("active");
 };
 
-settingsBtn.onclick=()=>{
-settings.classList.add("active");
-sidebar.classList.remove("active");
-overlay.classList.add("active");
+settingsBtn.onclick = () => {
+  settings.classList.add("active");
+  sidebar.classList.remove("active");
+  overlay.classList.add("active");
 };
 
-overlay.onclick=()=>{
-sidebar.classList.remove("active");
-settings.classList.remove("active");
-overlay.classList.remove("active");
-};
-
-// COLOR SYSTEM
-const c1=document.getElementById("c1");
-const c2=document.getElementById("c2");
-const c3=document.getElementById("c3");
-
-function updateColors(){
-document.body.style.setProperty("--c1",c1.value);
-document.body.style.setProperty("--c2",c2.value);
-document.body.style.setProperty("--c3",c3.value);
+// CLOSE
+function closeAll() {
+  sidebar.classList.remove("active");
+  settings.classList.remove("active");
+  overlay.classList.remove("active");
 }
 
-c1.oninput=updateColors;
-c2.oninput=updateColors;
-c3.oninput=updateColors;
+overlay.onclick = closeAll;
+closeMenu.onclick = closeAll;
+closeSettings.onclick = closeAll;
+
+// ✅ FIXED COLOR SYSTEM
+const c1 = document.getElementById("c1");
+const c2 = document.getElementById("c2");
+const c3 = document.getElementById("c3");
+
+function updateColors() {
+  document.documentElement.style.setProperty("--color-bg-primary", c1.value);
+  document.documentElement.style.setProperty("--color-bg-secondary", c2.value);
+  document.documentElement.style.setProperty("--color-accent-primary", c3.value);
+}
+
+c1.oninput = updateColors;
+c2.oninput = updateColors;
+c3.oninput = updateColors;
 
 // ANIMATION
-const anim=document.getElementById("anim");
-const all=["flow","pulse","zoom","hue","glow","mouse"];
+const anim = document.getElementById("anim");
+const all = ["flow","pulse","zoom","hue","glow","mouse"];
 
-anim.onchange=()=>{
-document.body.classList.remove(...all);
-if(anim.value!=="none") document.body.classList.add(anim.value);
+anim.onchange = () => {
+  document.body.classList.remove(...all);
+  if (anim.value !== "none") document.body.classList.add(anim.value);
 };
 
-// PARTICLES WITH LINES
-const canvas=document.getElementById("particles");
-const ctx=canvas.getContext("2d");
+// PARTICLES
+const canvas = document.getElementById("particles");
+const ctx = canvas.getContext("2d");
 
-canvas.width=innerWidth;
-canvas.height=innerHeight;
+function resizeCanvas() {
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+}
+resizeCanvas();
+window.addEventListener("resize", resizeCanvas);
 
-let pts=[];
-for(let i=0;i<70;i++){
-pts.push({x:Math.random()*innerWidth,y:Math.random()*innerHeight,dx:Math.random()-0.5,dy:Math.random()-0.5});
+let pts = [];
+for (let i = 0; i < 70; i++) {
+  pts.push({
+    x: Math.random() * canvas.width,
+    y: Math.random() * canvas.height,
+    dx: Math.random() - 0.5,
+    dy: Math.random() - 0.5
+  });
 }
 
-function draw(){
-ctx.clearRect(0,0,canvas.width,canvas.height);
+function draw() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-pts.forEach(p=>{
-p.x+=p.dx;p.y+=p.dy;
-ctx.fillRect(p.x,p.y,2,2);
-});
+  pts.forEach(p => {
+    p.x += p.dx;
+    p.y += p.dy;
 
-for(let i=0;i<pts.length;i++){
-for(let j=i+1;j<pts.length;j++){
-let dx=pts[i].x-pts[j].x;
-let dy=pts[i].y-pts[j].y;
-let dist=Math.sqrt(dx*dx+dy*dy);
+    ctx.fillStyle = "white";
+    ctx.fillRect(p.x, p.y, 2, 2);
+  });
 
-if(dist<100){
-ctx.strokeStyle="rgba(255,255,255,0.1)";
-ctx.beginPath();
-ctx.moveTo(pts[i].x,pts[i].y);
-ctx.lineTo(pts[j].x,pts[j].y);
-ctx.stroke();
-}
-}
-}
+  for (let i = 0; i < pts.length; i++) {
+    for (let j = i + 1; j < pts.length; j++) {
+      let dx = pts[i].x - pts[j].x;
+      let dy = pts[i].y - pts[j].y;
+      let dist = Math.sqrt(dx * dx + dy * dy);
 
-requestAnimationFrame(draw);
+      if (dist < 100) {
+        ctx.strokeStyle = "rgba(255,255,255,0.1)";
+        ctx.beginPath();
+        ctx.moveTo(pts[i].x, pts[i].y);
+        ctx.lineTo(pts[j].x, pts[j].y);
+        ctx.stroke();
+      }
+    }
+  }
+
+  requestAnimationFrame(draw);
 }
 draw();
 
 // CURSOR
-const cursor=document.querySelector(".cursor");
-document.addEventListener("mousemove",e=>{
-cursor.style.left=e.clientX+"px";
-cursor.style.top=e.clientY+"px";
+const cursor = document.querySelector(".cursor");
 
-if(document.body.classList.contains("mouse")){
-document.body.style.backgroundPosition=
-(e.clientX/window.innerWidth*100)+"% "+
-(e.clientY/window.innerHeight*100)+"%";
-}
+document.addEventListener("mousemove", e => {
+  cursor.style.left = e.clientX + "px";
+  cursor.style.top = e.clientY + "px";
 });
 
-// SCROLL REVEAL
-window.addEventListener("scroll",()=>{
-document.querySelectorAll(".reveal").forEach(el=>{
-if(el.getBoundingClientRect().top<window.innerHeight-100){
-el.classList.add("active");
-}
-});
-});
+// SCROLL REVEAL + TIMELINE
+window.addEventListener("scroll", () => {
+  document.querySelectorAll(".reveal").forEach(el => {
+    if (el.getBoundingClientRect().top < window.innerHeight - 100) {
+      el.classList.add("active");
+    }
+  });
 
-// 3D CARD EFFECT
-document.querySelectorAll(".card").forEach(card=>{
-card.addEventListener("mousemove",(e)=>{
-let rect=card.getBoundingClientRect();
-let x=e.clientX-rect.left;
-let y=e.clientY-rect.top;
-
-let rotateX=(y/rect.height-0.5)*10;
-let rotateY=(x/rect.width-0.5)*10;
-
-card.style.transform=`rotateX(${-rotateX}deg) rotateY(${rotateY}deg)`;
+  document.querySelectorAll(".timeline-item").forEach((item, index) => {
+    if (item.getBoundingClientRect().top < window.innerHeight - 100) {
+      setTimeout(() => {
+        item.classList.add("active");
+      }, index * 200);
+    }
+  });
 });
 
-card.addEventListener("mouseleave",()=>{
-card.style.transform="rotateX(0) rotateY(0)";
-});
-});
+// ===============================
+// SETTINGS PANEL FUNCTIONALITY
+// ===============================
 
+const animSelect = document.getElementById("anim");
+
+// Apply default animation
+document.body.classList.add("flow");
+
+animSelect.addEventListener("change", () => {
+    // Remove all animation classes first
+    document.body.classList.remove(
+        "flow",
+        "pulse",
+        "zoom",
+        "hue",
+        "glow"
+    );
+
+    // Add selected animation
+    if (animSelect.value !== "none") {
+        document.body.classList.add(animSelect.value);
+    }
+});
